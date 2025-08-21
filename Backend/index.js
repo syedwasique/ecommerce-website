@@ -314,6 +314,17 @@ const pool = new Pool({
   port: process.env.DB_PORT || 5432,
 });
 
+
+
+
+// ✅ Serve static files from Vite build
+app.use(express.static(path.join(__dirname, "../Frontend/vite-project/dist")));
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../Frontend/vite-project/dist", "index.html"));
+});
+
+
 // Test database connection
 pool.connect((err) => {
   if (err) {
