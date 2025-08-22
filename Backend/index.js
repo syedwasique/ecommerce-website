@@ -305,13 +305,10 @@ app.use(cors());
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// PostgreSQL connection
+// PostgreSQL connection (Render uses DATABASE_URL)
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT || 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // required on Render
 });
 
 
@@ -390,120 +387,170 @@ admin.initializeApp({
 // Make sure this is exported if you're using it in multiple files
 module.exports = admin;
 
-
-
-
-// Create new tables and migrate data
-const migrateDatabase = async () => {
-  const client = await pool.connect();
+// Function to migrate the database (create tables if not exist)
+async function migrateDatabase() {
   try {
-    // Check if products table exists
-    const res = await client.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE  table_schema = 'public'
-        AND    table_name   = 'products'
-      );
-    `);
-    
-    if (res.rows[0].exists) {
-      console.log('Database already migrated');
-      return;
-    }
+    const client = await pool.connect();
 
-    console.log('Starting database migration...');
-    
-    // Create new tables
     await client.query(`
-      CREATE TABLE products (
+      CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        base_price DECIMAL NOT NULL,
-        image_url VARCHAR(255),
-        category_id INTEGER REFERENCES categories(id)
+        name VARCHAR(100),
+        email VARCHAR(100) UNIQUE,
+        password VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    
-    await client.query(`
-      CREATE TABLE product_special_types (
-        product_id INTEGER PRIMARY KEY REFERENCES products(id),
-        is_new_arrival BOOLEAN DEFAULT false,
-        is_best_seller BOOLEAN DEFAULT false,
-        is_deal BOOLEAN DEFAULT false,
-        units_sold INTEGER,
-        release_date DATE,
-        discount_price DECIMAL,
-        discount_percent DECIMAL
-      );
-    `);
-    
-    console.log('Created new tables');
-    
-    // Migrate data from old tables
-    const migrateTable = async (tableName, specialType) => {
-      const rows = await client.query(`SELECT * FROM ${tableName}`);
-      
-      for (const row of rows.rows) {
-        // Insert into products
-        const newProduct = await client.query(`
-          INSERT INTO products (name, description, base_price, image_url, category_id)
-          VALUES ($1, $2, $3, $4, $5)
-          RETURNING id
-        `, [
-          row.name,
-          row.description,
-          row.price || row.original_price || row.base_price,
-          row.image_url || row.image,
-          row.category_id
-        ]);
-        
-        const productId = newProduct.rows[0].id;
-        
-        // Insert into special types
-        const specialColumns = [];
-        const specialValues = [];
-        
-        if (specialType === 'new_arrivals') {
-          specialColumns.push('is_new_arrival', 'release_date');
-          specialValues.push(true, row.release_date);
-        }
-        else if (specialType === 'best_sellers') {
-          specialColumns.push('is_best_seller', 'units_sold');
-          specialValues.push(true, row.units_sold);
-        }
-        else if (specialType === 'deals') {
-          specialColumns.push('is_deal', 'discount_price', 'discount_percent');
-          specialValues.push(true, row.discount_price, row.discount_percent);
-        }
-        
-        if (specialColumns.length > 0) {
-          await client.query(`
-            INSERT INTO product_special_types 
-            (product_id, ${specialColumns.join(', ')})
-            VALUES ($1, ${specialValues.map((_, i) => `$${i + 2}`).join(', ')})
-          `, [productId, ...specialValues]);
-        }
-      }
-      
-      console.log(`Migrated ${rows.rowCount} rows from ${tableName}`);
-    };
-    
-    // Migrate each table
-    await migrateTable('new_arrivals', 'new_arrivals');
-    await migrateTable('best_sellers', 'best_sellers');
-    await migrateTable('deals', 'deals');
-    
-    console.log('Database migration completed successfully');
-  } catch (err) {
-    console.error('Migration failed:', err);
-  } finally {
-    client.release();
-  }
-};
 
-// Run migration on startup
-migrateDatabase();
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        description TEXT,
+        price NUMERIC(10, 2),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+        total NUMERIC(10, 2),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS order_items (
+        id SERIAL PRIMARY KEY,
+        order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+        product_id INT REFERENCES products(id) ON DELETE CASCADE,
+        quantity INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    console.log("✅ Database migration completed");
+    client.release();
+  } catch (err) {
+    console.error("❌ Migration error:", err);
+  }
+}
+
+
+
+// // Create new tables and migrate data
+// const migrateDatabase = async () => {
+//   const client = await pool.connect();
+//   try {
+//     // Check if products table exists
+//     const res = await client.query(`
+//       SELECT EXISTS (
+//         SELECT FROM information_schema.tables 
+//         WHERE  table_schema = 'public'
+//         AND    table_name   = 'products'
+//       );
+//     `);
+    
+//     if (res.rows[0].exists) {
+//       console.log('Database already migrated');
+//       return;
+//     }
+
+//     console.log('Starting database migration...');
+    
+//     // Create new tables
+//     await client.query(`
+//       CREATE TABLE products (
+//         id SERIAL PRIMARY KEY,
+//         name VARCHAR(255) NOT NULL,
+//         description TEXT,
+//         base_price DECIMAL NOT NULL,
+//         image_url VARCHAR(255),
+//         category_id INTEGER REFERENCES categories(id)
+//       );
+//     `);
+    
+//     await client.query(`
+//       CREATE TABLE product_special_types (
+//         product_id INTEGER PRIMARY KEY REFERENCES products(id),
+//         is_new_arrival BOOLEAN DEFAULT false,
+//         is_best_seller BOOLEAN DEFAULT false,
+//         is_deal BOOLEAN DEFAULT false,
+//         units_sold INTEGER,
+//         release_date DATE,
+//         discount_price DECIMAL,
+//         discount_percent DECIMAL
+//       );
+//     `);
+    
+//     console.log('Created new tables');
+    
+//     // Migrate data from old tables
+//     const migrateTable = async (tableName, specialType) => {
+//       const rows = await client.query(`SELECT * FROM ${tableName}`);
+      
+//       for (const row of rows.rows) {
+//         // Insert into products
+//         const newProduct = await client.query(`
+//           INSERT INTO products (name, description, base_price, image_url, category_id)
+//           VALUES ($1, $2, $3, $4, $5)
+//           RETURNING id
+//         `, [
+//           row.name,
+//           row.description,
+//           row.price || row.original_price || row.base_price,
+//           row.image_url || row.image,
+//           row.category_id
+//         ]);
+        
+//         const productId = newProduct.rows[0].id;
+        
+//         // Insert into special types
+//         const specialColumns = [];
+//         const specialValues = [];
+        
+//         if (specialType === 'new_arrivals') {
+//           specialColumns.push('is_new_arrival', 'release_date');
+//           specialValues.push(true, row.release_date);
+//         }
+//         else if (specialType === 'best_sellers') {
+//           specialColumns.push('is_best_seller', 'units_sold');
+//           specialValues.push(true, row.units_sold);
+//         }
+//         else if (specialType === 'deals') {
+//           specialColumns.push('is_deal', 'discount_price', 'discount_percent');
+//           specialValues.push(true, row.discount_price, row.discount_percent);
+//         }
+        
+//         if (specialColumns.length > 0) {
+//           await client.query(`
+//             INSERT INTO product_special_types 
+//             (product_id, ${specialColumns.join(', ')})
+//             VALUES ($1, ${specialValues.map((_, i) => `$${i + 2}`).join(', ')})
+//           `, [productId, ...specialValues]);
+//         }
+//       }
+      
+//       console.log(`Migrated ${rows.rowCount} rows from ${tableName}`);
+//     };
+    
+//     // Migrate each table
+//     await migrateTable('new_arrivals', 'new_arrivals');
+//     await migrateTable('best_sellers', 'best_sellers');
+//     await migrateTable('deals', 'deals');
+    
+//     console.log('Database migration completed successfully');
+//   } catch (err) {
+//     console.error('Migration failed:', err);
+//   } finally {
+//     client.release();
+//   }
+// };
+
+// // Run migration on startup
+// migrateDatabase();
 
 // API Endpoints
 
