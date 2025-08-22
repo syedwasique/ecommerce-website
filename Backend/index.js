@@ -305,6 +305,16 @@ app.use(cors());
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+
+// // PostgreSQL connection
+// const pool = new Pool({
+//   user: process.env.DB_USER,
+//   host: process.env.DB_HOST,
+//   database: process.env.DB_NAME,
+//   password: process.env.DB_PASSWORD,
+//   port: process.env.DB_PORT || 5432,
+// });
+
 // PostgreSQL connection (Render uses DATABASE_URL)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -314,12 +324,12 @@ const pool = new Pool({
 
 
 
-// ✅ Serve static files from Vite build
-app.use(express.static(path.join(__dirname, "../Frontend/vite-project/dist")));
+// // ✅ Serve static files from Vite build
+// app.use(express.static(path.join(__dirname, "../Frontend/vite-project/dist")));
 
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../Frontend/vite-project/dist", "index.html"));
-});
+// app.get(/.*/, (req, res) => {
+//   res.sendFile(path.join(__dirname, "../Frontend/vite-project/dist", "index.html"));
+// });
 
 
 // Test database connection
@@ -394,12 +404,13 @@ async function migrateDatabase() {
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100),
-        email VARCHAR(100) UNIQUE,
-        password VARCHAR(255),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+  id SERIAL PRIMARY KEY,
+  firebase_uid VARCHAR(100) UNIQUE,
+  name VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
     `);
 
     await client.query(`
@@ -592,7 +603,8 @@ const createReviewsTable = async () => {
 };
 
 // Call this function when your server starts
-createReviewsTable();
+await migrateDatabase();
+ await createReviewsTable();
 
 // Get reviews for a product with pagination
 app.get('/api/product/:id/reviews', async (req, res) => {
