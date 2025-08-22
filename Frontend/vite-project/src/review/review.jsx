@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Authcontext';
-import styles from './Review.module.css';
+import styles from './review.module.css';
 
 const Review = () => {
   const { id: productId } = useParams();
