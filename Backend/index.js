@@ -601,10 +601,21 @@ const createReviewsTable = async () => {
     console.error('Error creating reviews table:', err);
   }
 };
+// Start server after migrations
+(async () => {
+  try {
+    await migrateDatabase();      // creates users, products, orders, order_items
+    await createReviewsTable();   // safe now, products already exists
 
-// Call this function when your server starts
-await migrateDatabase();
- await createReviewsTable();
+    app.listen(port, () => {
+      console.log(`✅ Server running on port ${port}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    process.exit(1);
+  }
+})();
+
 
 // Get reviews for a product with pagination
 app.get('/api/product/:id/reviews', async (req, res) => {
@@ -1223,10 +1234,5 @@ app.delete('/api/orders/:orderId', async (req, res) => {
 // Handle 404 errors
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
-});
-
-// Start server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
 });
 
