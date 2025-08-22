@@ -20,7 +20,7 @@ const OrderHistory = () => {
     const fetchOrders = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/orders/user/${currentUser.uid}`
+          `api/api/orders/user/${currentUser.uid}`
         );
         
         // Handle HTML responses

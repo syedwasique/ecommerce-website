@@ -27,7 +27,7 @@ const Review = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://localhost:5000/api/product/${productId}/reviews`);
+        const response = await fetch(`api/api/product/${productId}/reviews`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch reviews: ${response.status}`);
@@ -55,7 +55,7 @@ const Review = () => {
     try {
       const token = await currentUser.getIdToken();
       
-      const response = await fetch(`http://localhost:5000/api/product/${productId}/reviews`, {
+      const response = await fetch(`api/api/product/${productId}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const Review = () => {
       setError(null);
       
       const token = await currentUser.getIdToken();
-      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+      const response = await fetch(`api/api/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ const Review = () => {
       setError(null);
       
       const token = await currentUser.getIdToken();
-      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+      const response = await fetch(`api/api/reviews/${reviewId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

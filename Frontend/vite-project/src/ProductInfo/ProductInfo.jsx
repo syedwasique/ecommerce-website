@@ -26,7 +26,7 @@ const ProductDetail = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`http://localhost:5000/api/product/${id}`);
+        const response = await fetch(`api/api/product/${id}`);
         
         if (response.status === 404) {
           throw new Error('Product not found');
@@ -417,7 +417,7 @@ export default ProductDetail;
 //           setError(null);
           
 //           // Use the unified product endpoint
-//           const response = await fetch(`http://localhost:5000/api/product/${id}`);
+//           const response = await fetch(`api/api/product/${id}`);
           
 //           if (response.status === 404) {
 //             throw new Error('Product not found');

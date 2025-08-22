@@ -30,9 +30,9 @@ const HomePage = ({ categories }) => {
     const fetchHomeData = async () => {
       try {
         const [arrivalsRes, bestRes, dealsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/new-arrivals?limit=5'),
-          fetch('http://localhost:5000/api/best-sellers?limit=5'),
-          fetch('http://localhost:5000/api/deals?limit=5')
+          fetch('api/api/new-arrivals?limit=5'),
+          fetch('api/api/best-sellers?limit=5'),
+          fetch('api/api/deals?limit=5')
         ]);
 
         const arrivalsData = await arrivalsRes.json();
@@ -208,9 +208,9 @@ export default HomePage;
 //     const fetchHomeData = async () => {
 //       try {
 //         const [arrivalsRes, bestRes, dealsRes] = await Promise.all([
-//           fetch('http://localhost:5000/api/new-arrivals?limit=5'),
-//           fetch('http://localhost:5000/api/best-sellers?limit=5'),
-//           fetch('http://localhost:5000/api/deals?limit=5')
+//           fetch('api/api/new-arrivals?limit=5'),
+//           fetch('api/api/best-sellers?limit=5'),
+//           fetch('api/api/deals?limit=5')
 //         ]);
 
 //         const arrivalsData = await arrivalsRes.json();

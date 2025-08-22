@@ -51,7 +51,7 @@ function App() {
     // Fetch categories on app load
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/categories');
+        const response = await fetch('api/api/categories');
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -189,7 +189,7 @@ export default App;
 //     // Fetch categories on app load
 //     const fetchCategories = async () => {
 //       try {
-//         const response = await fetch('http://localhost:5000/api/categories');
+//         const response = await fetch('api/api/categories');
 //         const data = await response.json();
 //         setCategories(data);
 //       } catch (error) {
@@ -408,7 +408,7 @@ export default App;
   //     // Fetch categories on app load
   //     const fetchCategories = async () => {
   //       try {
-  //         const response = await fetch('http://localhost:5000/api/categories');
+  //         const response = await fetch('api/api/categories');
   //         const data = await response.json();
   //         setCategories(data);
   //       } catch (error) {

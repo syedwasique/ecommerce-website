@@ -15,7 +15,7 @@ const NewArrivalsPage = () => {
     const fetchNewArrivals = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/new-arrivals');
+        const response = await fetch('api/api/new-arrivals');
         
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);
@@ -176,7 +176,7 @@ export default NewArrivalsPage;
 //     const fetchNewArrivals = async () => {
 //       try {
 //         setLoading(true);
-//         const response = await fetch('http://localhost:5000/api/new-arrivals');
+//         const response = await fetch('api/api/new-arrivals');
         
 //         if (!response.ok) {
 //           throw new Error(`Failed to fetch: ${response.status}`);
@@ -348,7 +348,7 @@ export default NewArrivalsPage;
 //     const fetchNewArrivals = async () => {
 //       try {
 //         setLoading(true);
-//         const response = await fetch('http://localhost:5000/api/new-arrivals');
+//         const response = await fetch('api/api/new-arrivals');
         
 //         if (!response.ok) {
 //           throw new Error(`Failed to fetch: ${response.status}`);

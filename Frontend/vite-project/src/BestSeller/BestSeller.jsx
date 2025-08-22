@@ -26,7 +26,7 @@ const BestSellersPage = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('http://localhost:5000/api/best-sellers');
+        const response = await fetch('api/api/best-sellers');
         
         if (!response.ok) {
           throw new Error(`Failed to fetch best sellers: ${response.status}`);
@@ -213,7 +213,7 @@ export default BestSellersPage;
 //         setLoading(true);
 //         setError(null);
         
-//         const response = await fetch('http://localhost:5000/api/best-sellers');
+//         const response = await fetch('api/api/best-sellers');
         
 //         if (!response.ok) {
 //           throw new Error(`Failed to fetch best sellers: ${response.status}`);
@@ -415,7 +415,7 @@ export default BestSellersPage;
 //         setLoading(true);
 //         setError(null);
         
-//         const response = await fetch('http://localhost:5000/api/best-sellers');
+//         const response = await fetch('api/api/best-sellers');
         
 //         if (!response.ok) {
 //           throw new Error(`Failed to fetch best sellers: ${response.status}`);

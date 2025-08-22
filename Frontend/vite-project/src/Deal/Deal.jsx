@@ -11,7 +11,7 @@ const DealsPage = () => {
   useEffect(() => {
     const fetchDeals = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/deals');
+        const response = await fetch('api/api/deals');
         const data = await response.json();
         
         const processedProducts = data.map(product => ({
@@ -97,7 +97,7 @@ export default DealsPage;
 //   useEffect(() => {
 //     const fetchDeals = async () => {
 //       try {
-//         const response = await fetch('http://localhost:5000/api/deals');
+//         const response = await fetch('api/api/deals');
 //         const data = await response.json();
         
 //         const processedProducts = data.map(product => ({
@@ -193,7 +193,7 @@ export default DealsPage;
 //   useEffect(() => {
 //     const fetchDeals = async () => {
 //       try {
-//         const response = await fetch('http://localhost:5000/api/deals');
+//         const response = await fetch('api/api/deals');
 //         const data = await response.json();
         
 //         const processedProducts = data.map(product => ({

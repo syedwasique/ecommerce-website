@@ -20,7 +20,7 @@ const CategoryProductsPage = () => {
         setError(null);
         
         // Fetch category details
-        const categoryRes = await fetch(`http://localhost:5000/api/categories/${categoryId}`);
+        const categoryRes = await fetch(`api/api/categories/${categoryId}`);
         if (!categoryRes.ok) {
           throw new Error(`Category not found (${categoryRes.status})`);
         }
@@ -37,7 +37,7 @@ const CategoryProductsPage = () => {
         setCategory(currentCategory);
         
         // Fetch products
-        const productsRes = await fetch(`http://localhost:5000/api/category/${categoryId}`);
+        const productsRes = await fetch(`api/api/category/${categoryId}`);
         
         if (!productsRes.ok) {
           const errorText = await productsRes.text();
@@ -253,7 +253,7 @@ export default CategoryProductsPage;
 //         setError(null);
         
 //         // Fetch category details
-//         const categoryRes = await fetch(`http://localhost:5000/api/categories/${categoryId}`);
+//         const categoryRes = await fetch(`api/api/categories/${categoryId}`);
 //         if (!categoryRes.ok) {
 //           throw new Error(`Category not found (${categoryRes.status})`);
 //         }
@@ -270,7 +270,7 @@ export default CategoryProductsPage;
 //         setCategory(currentCategory);
         
 //         // Fetch products
-//         const productsRes = await fetch(`http://localhost:5000/api/category/${categoryId}`);
+//         const productsRes = await fetch(`api/api/category/${categoryId}`);
         
 //         if (!productsRes.ok) {
 //           const errorText = await productsRes.text();
@@ -481,7 +481,7 @@ export default CategoryProductsPage;
 //         setError(null);
         
 //         // Fetch category details
-//         const categoryRes = await fetch(`http://localhost:5000/api/categories/${categoryId}`);
+//         const categoryRes = await fetch(`api/api/categories/${categoryId}`);
 //         if (!categoryRes.ok) {
 //           throw new Error(`Category not found (${categoryRes.status})`);
 //         }
@@ -498,7 +498,7 @@ export default CategoryProductsPage;
 //         setCategory(currentCategory);
         
 //         // Fetch products
-//         const productsRes = await fetch(`http://localhost:5000/api/category/${categoryId}`);
+//         const productsRes = await fetch(`api/api/category/${categoryId}`);
         
 //         if (!productsRes.ok) {
 //           const errorText = await productsRes.text();

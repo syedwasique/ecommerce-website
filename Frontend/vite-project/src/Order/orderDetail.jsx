@@ -21,7 +21,7 @@ const OrderDetails = () => {
     const fetchOrder = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/orders/order/${orderId}?userId=${currentUser.uid}`
+          `api/api/orders/order/${orderId}?userId=${currentUser.uid}`
         );
         
         if (!response.ok) {
@@ -45,7 +45,7 @@ const OrderDetails = () => {
     if (window.confirm('Are you sure you want to cancel this order?')) {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/orders/${orderId}`, 
+          `api/api/orders/${orderId}`, 
           { method: 'DELETE' }
         );
         
