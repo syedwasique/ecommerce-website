@@ -12,37 +12,32 @@ const NewArrivalsPage = () => {
   const [filterCategory, setFilterCategory] = useState('all');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchNewArrivals = async () => {
-      try {
-        setLoading(true);
-  const response = await api.get("/api/new-arrivals");
-const data = response.data; // axios automatically parses JSON
+useEffect(() => {
+  const fetchNewArrivals = async () => {
+    try {
+      setLoading(true);
 
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        
-       
-        
-        const processedData = data.map(product => ({
-          ...product,
-          price: parseFloat(product.price) || 0,
-          release_date: new Date(product.release_date),
-          available_sizes: product.available_sizes || ['7', '8', '9', '10', '11', '12']
-        }));
-        
-        setProducts(processedData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching new arrivals:', error);
-        setLoading(false);
-      }
-    };
+      const response = await api.get("/api/new-arrivals");
+      const data = response.data; // axios automatically parses JSON
 
-    fetchNewArrivals();
-  }, []);
+      const processedData = data.map(product => ({
+        ...product,
+        price: parseFloat(product.price) || 0,
+        release_date: new Date(product.release_date),
+        available_sizes: product.available_sizes || ['7', '8', '9', '10', '11', '12']
+      }));
+
+      setProducts(processedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching new arrivals:", error);
+      setLoading(false);
+    }
+  };
+
+  fetchNewArrivals();
+}, []);
+
 
   // Handle add to cart
   const handleAddToCart = (productId, size, price, e) => {
