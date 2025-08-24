@@ -318,7 +318,9 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // PostgreSQL connection (Render uses DATABASE_URL)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // required on Render
+  ssl: process.env.NODE_ENV === "production" 
+    ? { rejectUnauthorized: false }  // for Render
+    : false                          // for local
 });
 
 
@@ -926,6 +928,19 @@ app.get('/api/category/:categoryId', async (req, res) => {
     });
   }
 });
+
+
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM products LIMIT 5");
+    console.log("✅ DB Result:", result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ DB Query Error:", err);
+    res.status(500).json({ error: "DB error", details: err.message });
+  }
+});
+
 
 // Get new arrivals
 app.get('/api/new-arrivals', async (req, res) => {
