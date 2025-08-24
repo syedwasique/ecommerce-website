@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../ProductCard/ProductCard';
+import api from "../api";
 import './new.css';
 
 const NewArrivalsPage = () => {
@@ -15,13 +16,15 @@ const NewArrivalsPage = () => {
     const fetchNewArrivals = async () => {
       try {
         setLoading(true);
-        const response = await fetch('api/api/new-arrivals');
+  const response = await api.get("/api/new-arrivals");
+const data = response.data; // axios automatically parses JSON
+
         
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);
         }
         
-        const data = await response.json();
+       
         
         const processedData = data.map(product => ({
           ...product,
