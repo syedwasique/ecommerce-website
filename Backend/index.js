@@ -929,20 +929,6 @@ app.get('/api/category/:categoryId', async (req, res) => {
   }
 });
 
-
-app.get('/api/test-db', async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM products LIMIT 5");
-    console.log("✅ DB Result:", result.rows);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("❌ DB Query Error:", err);
-    res.status(500).json({ error: "DB error", details: err.message });
-  }
-});
-
-
-// Get new arrivals
 app.get('/api/new-arrivals', async (req, res) => {
   const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
   
@@ -960,7 +946,10 @@ app.get('/api/new-arrivals', async (req, res) => {
       LIMIT 20
     `);
     
+    console.log("DB Result:", result.rows); // 👈 log query results
+
     const products = result.rows.map(row => {
+      console.log("Processing row:", row); // 👈 log each row
       const product = processProduct(row);
       product.image = toAbsoluteUrl(product.image_url, baseUrl);
       return product;
@@ -968,10 +957,42 @@ app.get('/api/new-arrivals', async (req, res) => {
     
     res.json(products);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("❌ ERROR in /api/new-arrivals:", err); // 👈 log actual error
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 });
+
+
+// // Get new arrivals
+// app.get('/api/new-arrivals', async (req, res) => {
+//   const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+  
+//   try {
+//     const result = await pool.query(`
+//       SELECT 
+//         p.*,
+//         c.name AS category_name,
+//         ps.release_date
+//       FROM products p
+//       JOIN product_special_types ps ON p.id = ps.product_id
+//       JOIN categories c ON p.category_id = c.id
+//       WHERE ps.is_new_arrival = true
+//       ORDER BY ps.release_date DESC
+//       LIMIT 20
+//     `);
+    
+//     const products = result.rows.map(row => {
+//       const product = processProduct(row);
+//       product.image = toAbsoluteUrl(product.image_url, baseUrl);
+//       return product;
+//     });
+    
+//     res.json(products);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 // Get best sellers
 app.get('/api/best-sellers', async (req, res) => {
